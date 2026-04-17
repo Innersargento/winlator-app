@@ -1,16 +1,21 @@
-name: Build Android App
+name: Android CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
+  workflow_dispatch:  # Memungkinkan menjalankan workflow secara manual
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'  # Inisialisasi submodule jika ada
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -18,23 +23,38 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK, NDK
-        uses: android-actions/setup-android@v2
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
         with:
-          api-level: 33
-          ndk-version: 34.0.0
-          # Install CMake separately as 3.22.1 may not be available via SDK
-      - name: Install CMake 3.22.1
-        run: |
-          wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-linux-x86_64.tar.gz
-          tar -xzf cmake-3.22.1-linux-x86_64.tar.gz
-          sudo mv cmake-3.22.1-linux-x86_64 /opt/cmake-3.22.1
-          echo "/opt/cmake-3.22.1/bin" >> $GITHUB_PATH
-          # Verify version
-          cmake --version
+          packages: 'platforms;android-34 build-tools;34.0.0 ndk;24.0.8215888 cmake;3.22.1'
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
 
-      - name: Build with Gradle
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Build Release APK
         run: ./gradlew assembleRelease
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: winlator-debug
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: winlator-release-unsigned
+          path: app/build/outputs/apk/release/*.apk
