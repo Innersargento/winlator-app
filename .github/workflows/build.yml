@@ -31,6 +31,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Apply patches
+        run: |
+          if [ -d "patches" ] && [ -n "$(ls -A patches/*.patch 2>/dev/null)" ]; then
+            echo "Applying patches..."
+            git apply patches/*.patch
+          else
+            echo "No patches to apply."
+          fi
+
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:

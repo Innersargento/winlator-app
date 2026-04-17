@@ -1,0 +1,52 @@
+From 6656a47e93c9afd27cb8ee3872981919167961af Mon Sep 17 00:00:00 2001
+From: DevElderLost <128934990+DevElderLost@users.noreply.github.com>
+Date: Thu, 16 Apr 2026 10:50:41 +0800
+Subject: [PATCH] Add packaging options for JNI libraries
+
+---
+ app/build.gradle | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/app/build.gradle b/app/build.gradle
+index 8cffc19..c5eb520 100644
+--- a/app/build.gradle
++++ b/app/build.gradle
+@@ -34,6 +34,12 @@ android {
+             path 'src/main/cpp/CMakeLists.txt'
+         }
+     }
++
++    packagingOptions {
++        jniLibs {
++            pickFirsts += "**/libFLAC.so"
++        }
++    }
+ }
+ 
+ dependencies {
+From 2bf1a51f4f6925d6a6418f9ddfda612db659f2a2 Mon Sep 17 00:00:00 2001
+From: DevElderLost <128934990+DevElderLost@users.noreply.github.com>
+Date: Thu, 16 Apr 2026 10:59:44 +0800
+Subject: [PATCH] Update jniLibs packaging options to include all .so files
+
+---
+ app/build.gradle | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/app/build.gradle b/app/build.gradle
+index c5eb520..c0bce46 100644
+--- a/app/build.gradle
++++ b/app/build.gradle
+@@ -36,9 +36,9 @@ android {
+     }
+ 
+     packagingOptions {
+-        jniLibs {
+-            pickFirsts += "**/libFLAC.so"
+-        }
++    jniLibs {
++        pickFirsts += "**/*.so"
++       }
+     }
+ }
+ 
