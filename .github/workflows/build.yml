@@ -26,8 +26,10 @@ jobs:
           # Install CMake separately as 3.22.1 may not be available via SDK
       - name: Install CMake 3.22.1
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake=3.22.1-1ubuntu1
+          wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-linux-x86_64.tar.gz
+          tar -xzf cmake-3.22.1-linux-x86_64.tar.gz
+          sudo mv cmake-3.22.1-linux-x86_64 /opt/cmake-3.22.1
+          echo "/opt/cmake-3.22.1/bin" >> $GITHUB_PATH
           # Verify version
           cmake --version
 
