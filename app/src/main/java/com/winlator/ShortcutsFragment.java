@@ -1,7 +1,12 @@
 package com.winlator;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -205,6 +210,11 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
                             refreshContent();
                         });
                         break;
+                    case R.id.shortcut_add_to_home_screen:
+                        if (shortcut.getExtra("uuid").equals(""))
+                            shortcut.genUUID();
+                        addShortcutToScreen(shortcut);
+                        break;
                 }
                 return true;
             });
@@ -229,5 +239,25 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
                 activity.startActivity(intent);
             }
         }
+    }
+
+    private ShortcutInfo buildScreenShortCut(String shortLabel, String longLabel, int containerId, String shortcutPath, Icon icon, String uuid) {
+        Intent intent = new Intent(getActivity(), XServerDisplayActivity.class);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.putExtra("container_id", containerId);
+        intent.putExtra("shortcut_path", shortcutPath);
+
+        return new ShortcutInfo.Builder(getActivity(), uuid)
+                .setShortLabel(shortLabel)
+                .setLongLabel(longLabel)
+                .setIcon(icon)
+                .setIntent(intent)
+                .build();
+    }
+    private void addShortcutToScreen(Shortcut shortcut) {
+        ShortcutManager shortcutManager = getSystemService(requireContext(), ShortcutManager.class);
+        if (shortcutManager != null && shortcutManager.isRequestPinShortcutSupported())
+            shortcutManager.requestPinShortcut(buildScreenShortCut(shortcut.name, shortcut.name, shortcut.container.id,
+                    shortcut.file.getPath(), Icon.createWithBitmap(shortcut.icon), shortcut.getExtra("uuid")), null);
     }
 }

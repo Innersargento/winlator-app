@@ -147,6 +147,7 @@
     <string name="installed_version">Versão Instalada</string>
     <string name="unable_to_download_file">Não foi possível baixar o arquivo</string>
     <string name="stability">Estabilidade</string>
+    <string name="add_to_home_screen">Adicionar à Tela inicial</string>
     <string name="conservative">Conservador</string>
     <string name="intermediate">Intermediário</string>
     <string name="performance">Desempenho</string>

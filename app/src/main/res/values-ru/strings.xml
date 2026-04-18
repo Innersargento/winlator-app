@@ -147,6 +147,7 @@
     <string name="installed_version">Установленная версия</string>
     <string name="unable_to_download_file">Невозможно загрузить файл</string>
     <string name="stability">Стабильность</string>
+    <string name="add_to_home_screen">Добавить на главный экран</string>
     <string name="conservative">Консервативный</string>
     <string name="intermediate">Средний</string>
     <string name="performance">производительность</string>
