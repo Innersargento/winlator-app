@@ -182,7 +182,7 @@ public class SettingsFragment extends Fragment {
 
         loadGamepadPlayerConfigs(view);
 
-        if (MainActivity.ENABLE_WINE_INSTALL_FEATURE) {
+        if (MainActivity.DEBUG_MODE) {
             view.findViewById(R.id.LLWineInstallation).setVisibility(View.VISIBLE);
         }
 
