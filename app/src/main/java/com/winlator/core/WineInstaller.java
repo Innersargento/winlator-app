@@ -32,7 +32,22 @@ public abstract class WineInstaller {
         containerPatternDir.mkdirs();
 
         File linkFile = new File(rootDir, RootFS.HOME_PATH);
+
+        if (linkFile.exists()) {
+            FileUtils.delete(linkFile);
+        }
+
+        File parent = linkFile.getParentFile();
+        if (parent != null && !parent.isDirectory()) parent.mkdirs();
+
         FileUtils.symlink(containerPatternDir.getPath(), linkFile.getPath());
+
+        if (!FileUtils.isSymlink(linkFile)) {
+            AppUtils.showToast(activity, R.string.unable_to_install_wine);
+            FileUtils.delete(new File(installedWineDir, "/preinstall"));
+            AppUtils.restartApplication(activity);
+            return;
+        }
 
         GuestProgramLauncherComponent guestProgramLauncherComponent = environment.getComponent(GuestProgramLauncherComponent.class);
         guestProgramLauncherComponent.setBox64Preset(Box64Preset.STABILITY);
