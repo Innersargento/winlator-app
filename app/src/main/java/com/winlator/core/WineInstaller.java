@@ -33,12 +33,24 @@ public abstract class WineInstaller {
 
         File linkFile = new File(rootDir, RootFS.HOME_PATH);
 
+        if (linkFile.exists() && !FileUtils.delete(linkFile)) {
+            AppUtils.showToast(activity, R.string.unable_to_install_wine);
+            FileUtils.delete(new File(installedWineDir, "/preinstall"));
+            AppUtils.restartApplication(activity);
+            return;
+        }
+        
         if (linkFile.exists()) {
-            FileUtils.delete(linkFile);
+            AppUtils.showToast(activity, R.string.unable_to_install_wine);
+            FileUtils.delete(new File(installedWineDir, "/preinstall"));
+            AppUtils.restartApplication(activity);
+            return;
         }
 
-        File parent = linkFile.getParentFile();
-        if (parent != null && !parent.isDirectory()) parent.mkdirs();
+        File parentDir = linkFile.getParentFile();
+            if (parentDir != null && !parentDir.isDirectory()) {
+                parentDir.mkdirs();
+            }
 
         FileUtils.symlink(containerPatternDir.getPath(), linkFile.getPath());
 
@@ -48,6 +60,24 @@ public abstract class WineInstaller {
             AppUtils.restartApplication(activity);
             return;
         }
+
+        try {
+            String expected = containerPatternDir.getCanonicalPath();
+            String actual = linkFile.getCanonicalFile().getPath();
+            if (!expected.equals(actual)) {
+                AppUtils.showToast(activity, R.string.unable_to_install_wine);
+                FileUtils.delete(new File(installedWineDir, "/preinstall"));
+                AppUtils.restartApplication(activity);
+                return;
+            }
+        }
+        catch (Exception e) {
+            AppUtils.showToast(activity, R.string.unable_to_install_wine);
+            FileUtils.delete(new File(installedWineDir, "/preinstall"));
+            AppUtils.restartApplication(activity);
+            return;
+        }
+
 
         GuestProgramLauncherComponent guestProgramLauncherComponent = environment.getComponent(GuestProgramLauncherComponent.class);
         guestProgramLauncherComponent.setBox64Preset(Box64Preset.STABILITY);
